@@ -138,3 +138,18 @@ model_data/
 images/
 *.h5
 *.weights
+
+# Model weights and training outputs (too large for GitHub)
+*.pt
+*.onnx
+*.engine
+*.trt
+runs/
+outputs/
+mlruns/
+datasets/
+
+# Internal planning files
+ENHANCEMENT_PLAN.md
+copilot-instructions.md
+PRD.md

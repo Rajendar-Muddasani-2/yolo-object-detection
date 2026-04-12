@@ -1,0 +1,3 @@
+# Place best.onnx here after exporting from training notebook.
+# Expected: YOLOv8-large ONNX model with 10 wafer defect classes.
+# Export command: model.export(format="onnx", dynamic=True, simplify=True)

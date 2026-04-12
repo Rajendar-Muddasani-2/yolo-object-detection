@@ -1,153 +1,139 @@
-"""
-Unit tests for YOLO utilities
-"""
+"""Tests for wafer defect detection utilities."""
 
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np
-import tensorflow as tf
-from yolo_utils import yolo_filter_boxes, iou, yolo_non_max_suppression
+import pytest
+from PIL import Image
+
+from src.yolo_utils import (
+    DEFECT_CLASSES,
+    compute_iou,
+    draw_detections,
+)
 
 
-def test_yolo_filter_boxes():
-    """Test box filtering functionality"""
-    print("Testing yolo_filter_boxes...")
-    
-    tf.random.set_seed(10)
-    box_confidence = tf.random.normal([19, 19, 5, 1], mean=1, stddev=4, seed=1)
-    boxes = tf.random.normal([19, 19, 5, 4], mean=1, stddev=4, seed=1)
-    box_class_probs = tf.random.normal([19, 19, 5, 80], mean=1, stddev=4, seed=1)
-    
-    scores, filtered_boxes, classes = yolo_filter_boxes(
-        boxes, box_confidence, box_class_probs, threshold=0.5
-    )
-    
-    assert scores.shape[0] > 0, "Should have some boxes after filtering"
-    assert filtered_boxes.shape[1] == 4, "Boxes should have 4 coordinates"
-    assert len(scores) == len(classes), "Scores and classes should have same length"
-    
-    print("✓ yolo_filter_boxes test passed")
-    return True
+class TestDefectClasses:
+    def test_has_10_classes(self):
+        assert len(DEFECT_CLASSES) == 10
+
+    def test_expected_classes(self):
+        assert "scratch" in DEFECT_CLASSES
+        assert "particle" in DEFECT_CLASSES
+        assert "crack" in DEFECT_CLASSES
+        assert "delamination" in DEFECT_CLASSES
+
+    def test_no_duplicates(self):
+        assert len(DEFECT_CLASSES) == len(set(DEFECT_CLASSES))
 
 
-def test_iou():
-    """Test IoU calculation"""
-    print("Testing iou...")
-    
-    # Test intersecting boxes
-    box1 = (2, 1, 4, 3)
-    box2 = (1, 2, 3, 4)
-    iou_val = iou(box1, box2)
-    assert 0 < iou_val < 1, "IoU should be between 0 and 1 for intersecting boxes"
-    assert np.isclose(iou_val, 0.14285714, atol=1e-6), f"Expected ~0.1429, got {iou_val}"
-    
-    # Test non-intersecting boxes
-    box1 = (1, 2, 3, 4)
-    box2 = (5, 6, 7, 8)
-    iou_val = iou(box1, box2)
-    assert iou_val == 0, "IoU should be 0 for non-intersecting boxes"
-    
-    # Test boxes touching at vertices
-    box1 = (1, 1, 2, 2)
-    box2 = (2, 2, 3, 3)
-    iou_val = iou(box1, box2)
-    assert iou_val == 0, "IoU should be 0 for boxes touching at vertices"
-    
-    # Test boxes touching at edges
-    box1 = (1, 1, 3, 3)
-    box2 = (2, 3, 3, 4)
-    iou_val = iou(box1, box2)
-    assert iou_val == 0, "IoU should be 0 for boxes touching at edges"
-    
-    print("✓ iou test passed")
-    return True
+class TestComputeIoU:
+    def test_identical_boxes(self):
+        box = (10, 10, 50, 50)
+        assert compute_iou(box, box) == 1.0
+
+    def test_no_overlap(self):
+        box1 = (0, 0, 10, 10)
+        box2 = (20, 20, 30, 30)
+        assert compute_iou(box1, box2) == 0.0
+
+    def test_partial_overlap(self):
+        box1 = (0, 0, 20, 20)
+        box2 = (10, 10, 30, 30)
+        iou_val = compute_iou(box1, box2)
+        assert 0 < iou_val < 1
+        expected = 100 / (400 + 400 - 100)
+        assert abs(iou_val - expected) < 1e-6
+
+    def test_contained_box(self):
+        outer = (0, 0, 100, 100)
+        inner = (25, 25, 75, 75)
+        iou_val = compute_iou(outer, inner)
+        expected = 2500 / (10000 + 2500 - 2500)
+        assert abs(iou_val - expected) < 1e-6
+
+    def test_touching_edges(self):
+        box1 = (0, 0, 10, 10)
+        box2 = (10, 0, 20, 10)
+        assert compute_iou(box1, box2) == 0.0
+
+    def test_symmetry(self):
+        box1 = (5, 5, 25, 25)
+        box2 = (15, 15, 35, 35)
+        assert compute_iou(box1, box2) == compute_iou(box2, box1)
 
 
-def test_yolo_non_max_suppression():
-    """Test Non-Max Suppression"""
-    print("Testing yolo_non_max_suppression...")
-    
-    # Create overlapping boxes
-    scores = tf.constant([0.9, 0.85, 0.8, 0.6], dtype=tf.float32)
-    boxes = tf.constant([
-        [10, 10, 50, 50],
-        [12, 12, 52, 52],  # Overlaps with first box
-        [100, 100, 150, 150],  # Different location
-        [102, 102, 152, 152]  # Overlaps with third box
-    ], dtype=tf.float32)
-    classes = tf.constant([0, 0, 1, 1], dtype=tf.int64)
-    
-    nms_scores, nms_boxes, nms_classes = yolo_non_max_suppression(
-        scores, boxes, classes, max_boxes=10, iou_threshold=0.5
-    )
-    
-    # Should remove overlapping boxes
-    assert len(nms_scores) < len(scores), "NMS should remove some boxes"
-    assert len(nms_scores) > 0, "Should keep at least some boxes"
-    
-    # Scores should be in descending order (implicitly from NMS)
-    nms_scores_list = nms_scores.numpy().tolist()
-    
-    print(f"  Original boxes: {len(scores)}, After NMS: {len(nms_scores)}")
-    print("✓ yolo_non_max_suppression test passed")
-    return True
+class TestDrawDetections:
+    def test_draw_on_image(self):
+        img = Image.new("RGB", (640, 640), color=(128, 128, 128))
+        detections = [
+            {"class_id": 0, "class_name": "scratch", "confidence": 0.95, "bbox": [10, 10, 100, 100]},
+            {"class_id": 3, "class_name": "void", "confidence": 0.87, "bbox": [200, 200, 350, 350]},
+        ]
+        result = draw_detections(img, detections)
+        assert isinstance(result, Image.Image)
+        assert result.size == (640, 640)
+        # Original should not be modified
+        assert img is not result
+
+    def test_empty_detections(self):
+        img = Image.new("RGB", (640, 640))
+        result = draw_detections(img, [])
+        assert isinstance(result, Image.Image)
 
 
-def test_tensor_types():
-    """Test that functions return correct tensor types"""
-    print("Testing tensor types...")
-    
-    tf.random.set_seed(42)
-    box_confidence = tf.random.normal([19, 19, 5, 1], mean=1, stddev=4)
-    boxes = tf.random.normal([19, 19, 5, 4], mean=1, stddev=4)
-    box_class_probs = tf.random.normal([19, 19, 5, 80], mean=1, stddev=4)
-    
-    scores, filtered_boxes, classes = yolo_filter_boxes(
-        boxes, box_confidence, box_class_probs, threshold=0.5
-    )
-    
-    from tensorflow.python.framework.ops import EagerTensor
-    assert isinstance(scores, EagerTensor), "scores should be EagerTensor"
-    assert isinstance(filtered_boxes, EagerTensor), "boxes should be EagerTensor"
-    assert isinstance(classes, EagerTensor), "classes should be EagerTensor"
-    
-    print("✓ tensor types test passed")
-    return True
+class TestDataGenerator:
+    def test_import(self):
+        from src.data_generator import generate_dataset
+        assert callable(generate_dataset)
+
+    def test_generate_small_dataset(self, tmp_path):
+        from src.data_generator import generate_dataset
+
+        stats = generate_dataset(
+            output_dir=str(tmp_path / "data"),
+            n_images=10,
+            max_defects_per_image=3,
+            seed=42,
+            n_workers=1,
+        )
+        # Check splits exist
+        for split in ["train", "val", "test"]:
+            assert (tmp_path / "data" / split / "images").exists()
+            assert (tmp_path / "data" / split / "labels").exists()
+        # Check data.yaml
+        assert (tmp_path / "data" / "data.yaml").exists()
 
 
-def run_all_tests():
-    """Run all unit tests"""
-    print("\n" + "=" * 60)
-    print("Running YOLO Unit Tests")
-    print("=" * 60 + "\n")
-    
-    tests = [
-        test_yolo_filter_boxes,
-        test_iou,
-        test_yolo_non_max_suppression,
-        test_tensor_types
-    ]
-    
-    passed = 0
-    failed = 0
-    
-    for test in tests:
-        try:
-            if test():
-                passed += 1
-        except Exception as e:
-            print(f"✗ {test.__name__} failed: {str(e)}")
-            failed += 1
-    
-    print("\n" + "=" * 60)
-    print(f"Test Results: {passed} passed, {failed} failed")
-    print("=" * 60 + "\n")
-    
-    return failed == 0
+class TestAPIServer:
+    def test_import(self):
+        from src.api.server import app
+        assert app is not None
 
+    @pytest.mark.asyncio
+    async def test_health_endpoint(self):
+        from httpx import ASGITransport, AsyncClient
+        from src.api.server import app
 
-if __name__ == "__main__":
-    success = run_all_tests()
-    exit(0 if success else 1)
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            resp = await client.get("/health")
+            assert resp.status_code == 200
+            data = resp.json()
+            assert "status" in data
+
+    @pytest.mark.asyncio
+    async def test_classes_endpoint(self):
+        from httpx import ASGITransport, AsyncClient
+        from src.api.server import app
+
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
+            resp = await client.get("/classes")
+            assert resp.status_code == 200
+            classes = resp.json()
+            assert len(classes) == 10
+            assert "scratch" in classes

@@ -140,7 +140,6 @@ images/
 *.weights
 
 # Model weights and training outputs
-*.onnx
 *.engine
 *.trt
 runs/

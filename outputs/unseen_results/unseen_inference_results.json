@@ -1,0 +1,789 @@
+{
+  "model": "YOLOv8-Large (best.pt)",
+  "conf_threshold": 0.25,
+  "iou_threshold": 0.45,
+  "total_images": 20,
+  "images_with_defects": 20,
+  "clean_images": 0,
+  "defect_detection_rate": 1.0,
+  "total_detections": 57,
+  "mean_detections_per_image": 2.85,
+  "inference_speed": {
+    "mean_ms": 601.0,
+    "fps": 1.7
+  },
+  "class_distribution": {
+    "edge_chip": 52,
+    "pattern_shift": 3,
+    "crack": 2
+  },
+  "per_image": [
+    {
+      "image": "unseen_00.jpg",
+      "num_detections": 3,
+      "inference_ms": 1182.0,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9189,
+          "bbox_xyxy": [
+            395.1,
+            80.0,
+            460.1,
+            123.9
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.49,
+          "bbox_xyxy": [
+            494.9,
+            71.9,
+            511.1,
+            85.5
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.3854,
+          "bbox_xyxy": [
+            275.5,
+            408.5,
+            308.4,
+            483.0
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_01.jpg",
+      "num_detections": 1,
+      "inference_ms": 486.3,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9334,
+          "bbox_xyxy": [
+            136.2,
+            282.4,
+            188.7,
+            318.4
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_02.jpg",
+      "num_detections": 3,
+      "inference_ms": 807.6,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9334,
+          "bbox_xyxy": [
+            536.5,
+            215.9,
+            575.0,
+            280.7
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.8637,
+          "bbox_xyxy": [
+            371.8,
+            409.6,
+            417.8,
+            484.0
+          ]
+        },
+        {
+          "class_id": 4,
+          "class_name": "pattern_shift",
+          "confidence": 0.7351,
+          "bbox_xyxy": [
+            371.7,
+            409.7,
+            417.8,
+            484.0
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_03.jpg",
+      "num_detections": 3,
+      "inference_ms": 762.1,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9166,
+          "bbox_xyxy": [
+            325.9,
+            293.8,
+            349.6,
+            360.7
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.4955,
+          "bbox_xyxy": [
+            70.5,
+            505.7,
+            152.6,
+            565.5
+          ]
+        },
+        {
+          "class_id": 7,
+          "class_name": "crack",
+          "confidence": 0.2764,
+          "bbox_xyxy": [
+            88.1,
+            327.2,
+            121.2,
+            352.7
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_04.jpg",
+      "num_detections": 1,
+      "inference_ms": 754.1,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9417,
+          "bbox_xyxy": [
+            286.5,
+            207.9,
+            343.0,
+            274.2
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_05.jpg",
+      "num_detections": 1,
+      "inference_ms": 667.9,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.8374,
+          "bbox_xyxy": [
+            489.7,
+            142.4,
+            564.7,
+            175.4
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_06.jpg",
+      "num_detections": 5,
+      "inference_ms": 630.4,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9449,
+          "bbox_xyxy": [
+            277.9,
+            290.1,
+            332.4,
+            353.4
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.907,
+          "bbox_xyxy": [
+            459.0,
+            308.7,
+            524.9,
+            366.6
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.6624,
+          "bbox_xyxy": [
+            351.6,
+            360.6,
+            427.7,
+            439.7
+          ]
+        },
+        {
+          "class_id": 4,
+          "class_name": "pattern_shift",
+          "confidence": 0.492,
+          "bbox_xyxy": [
+            351.7,
+            360.6,
+            427.7,
+            439.7
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.2552,
+          "bbox_xyxy": [
+            122.9,
+            549.2,
+            146.9,
+            569.2
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_07.jpg",
+      "num_detections": 5,
+      "inference_ms": 565.7,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9344,
+          "bbox_xyxy": [
+            84.3,
+            319.8,
+            118.7,
+            399.5
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.928,
+          "bbox_xyxy": [
+            413.4,
+            505.8,
+            450.0,
+            539.1
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9044,
+          "bbox_xyxy": [
+            270.3,
+            514.6,
+            347.8,
+            581.3
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.7883,
+          "bbox_xyxy": [
+            321.8,
+            162.0,
+            401.5,
+            222.5
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.4454,
+          "bbox_xyxy": [
+            495.9,
+            72.1,
+            511.2,
+            86.6
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_08.jpg",
+      "num_detections": 4,
+      "inference_ms": 518.8,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9219,
+          "bbox_xyxy": [
+            173.5,
+            518.1,
+            225.1,
+            554.4
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.906,
+          "bbox_xyxy": [
+            377.9,
+            285.5,
+            399.4,
+            346.7
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9015,
+          "bbox_xyxy": [
+            416.3,
+            462.1,
+            461.2,
+            490.1
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.2644,
+          "bbox_xyxy": [
+            50.5,
+            459.7,
+            86.8,
+            512.7
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_09.jpg",
+      "num_detections": 2,
+      "inference_ms": 297.8,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.8135,
+          "bbox_xyxy": [
+            537.4,
+            224.0,
+            561.8,
+            295.3
+          ]
+        },
+        {
+          "class_id": 7,
+          "class_name": "crack",
+          "confidence": 0.2659,
+          "bbox_xyxy": [
+            542.5,
+            120.2,
+            586.1,
+            169.5
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_10.jpg",
+      "num_detections": 4,
+      "inference_ms": 313.1,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9359,
+          "bbox_xyxy": [
+            191.8,
+            198.8,
+            223.6,
+            248.4
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.8477,
+          "bbox_xyxy": [
+            97.5,
+            473.1,
+            134.7,
+            540.1
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.8371,
+          "bbox_xyxy": [
+            489.4,
+            115.8,
+            541.9,
+            181.6
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.3382,
+          "bbox_xyxy": [
+            496.7,
+            72.3,
+            511.5,
+            85.2
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_11.jpg",
+      "num_detections": 2,
+      "inference_ms": 312.8,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.8961,
+          "bbox_xyxy": [
+            515.2,
+            240.2,
+            593.6,
+            270.4
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.6282,
+          "bbox_xyxy": [
+            495.0,
+            72.0,
+            511.1,
+            85.8
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_12.jpg",
+      "num_detections": 3,
+      "inference_ms": 311.2,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.8229,
+          "bbox_xyxy": [
+            335.0,
+            406.2,
+            376.1,
+            470.5
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.4542,
+          "bbox_xyxy": [
+            128.3,
+            554.6,
+            142.8,
+            568.7
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.3575,
+          "bbox_xyxy": [
+            495.5,
+            72.1,
+            511.7,
+            86.3
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_13.jpg",
+      "num_detections": 4,
+      "inference_ms": 773.7,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9513,
+          "bbox_xyxy": [
+            339.5,
+            239.9,
+            398.2,
+            277.4
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9306,
+          "bbox_xyxy": [
+            443.3,
+            196.1,
+            471.9,
+            227.3
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.929,
+          "bbox_xyxy": [
+            234.4,
+            194.3,
+            258.7,
+            225.2
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.4603,
+          "bbox_xyxy": [
+            495.4,
+            71.5,
+            510.9,
+            84.4
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_14.jpg",
+      "num_detections": 5,
+      "inference_ms": 889.8,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9549,
+          "bbox_xyxy": [
+            462.2,
+            375.0,
+            499.0,
+            422.2
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9437,
+          "bbox_xyxy": [
+            376.0,
+            423.5,
+            450.9,
+            464.4
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.8543,
+          "bbox_xyxy": [
+            468.6,
+            112.5,
+            518.9,
+            179.9
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.3177,
+          "bbox_xyxy": [
+            129.8,
+            555.6,
+            142.2,
+            568.6
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.2673,
+          "bbox_xyxy": [
+            503.5,
+            73.4,
+            521.1,
+            92.8
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_15.jpg",
+      "num_detections": 1,
+      "inference_ms": 649.8,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9263,
+          "bbox_xyxy": [
+            263.0,
+            334.4,
+            325.3,
+            372.7
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_16.jpg",
+      "num_detections": 2,
+      "inference_ms": 384.1,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9073,
+          "bbox_xyxy": [
+            274.4,
+            107.9,
+            297.2,
+            141.2
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.3842,
+          "bbox_xyxy": [
+            130.0,
+            552.7,
+            144.4,
+            568.6
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_17.jpg",
+      "num_detections": 5,
+      "inference_ms": 454.9,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9475,
+          "bbox_xyxy": [
+            402.2,
+            474.4,
+            471.6,
+            519.2
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.8176,
+          "bbox_xyxy": [
+            528.1,
+            489.6,
+            581.8,
+            547.6
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.7666,
+          "bbox_xyxy": [
+            171.5,
+            302.8,
+            249.8,
+            371.4
+          ]
+        },
+        {
+          "class_id": 4,
+          "class_name": "pattern_shift",
+          "confidence": 0.4156,
+          "bbox_xyxy": [
+            527.9,
+            489.5,
+            581.8,
+            547.5
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.3553,
+          "bbox_xyxy": [
+            129.0,
+            556.0,
+            142.6,
+            568.2
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_18.jpg",
+      "num_detections": 2,
+      "inference_ms": 879.6,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.9354,
+          "bbox_xyxy": [
+            69.6,
+            234.3,
+            105.6,
+            297.6
+          ]
+        },
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.5113,
+          "bbox_xyxy": [
+            496.4,
+            71.6,
+            511.8,
+            85.7
+          ]
+        }
+      ]
+    },
+    {
+      "image": "unseen_19.jpg",
+      "num_detections": 1,
+      "inference_ms": 378.7,
+      "detections": [
+        {
+          "class_id": 2,
+          "class_name": "edge_chip",
+          "confidence": 0.7422,
+          "bbox_xyxy": [
+            489.3,
+            75.4,
+            546.5,
+            112.8
+          ]
+        }
+      ]
+    }
+  ]
+}

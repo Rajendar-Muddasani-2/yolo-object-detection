@@ -107,13 +107,50 @@ GET  /metrics          - Prometheus metrics
 
 ## Training Results
 
-*Results populated after GPU training — see `outputs/` directory after running notebook.*
+Trained on **NVIDIA A100-SXM4-80GB** (Google Colab). Dataset: 20K synthetic wafer defects + MVTec AD real industrial images (~25K total, 70/15/15 split).
 
-| Model | mAP@50 | mAP@50:95 | Params | Training Time |
-|-------|--------|-----------|--------|---------------|
-| YOLOv8-S | — | — | 11.2M | — |
-| YOLOv8-M | — | — | 25.9M | — |
-| **YOLOv8-L** | — | — | **43.7M** | — |
+### Model Comparison (10-class wafer defect detection)
+
+| Model | mAP@50 | mAP@50:95 | Precision | Recall | Params | Training Time |
+|-------|--------|-----------|-----------|--------|--------|---------------|
+| YOLOv8-S | 99.10% | 95.25% | 98.62% | 97.93% | 11.2M | 84 min |
+| YOLOv8-M | 99.16% | 96.05% | 98.76% | 98.36% | 25.9M | 134 min |
+| **YOLOv8-L** | **99.22%** | **95.74%** | **98.91%** | **98.61%** | **43.7M** | **334 min** |
+
+### Speed Benchmark (batch=1)
+
+| Backend | Mean Latency | FPS | Notes |
+|---------|-------------|-----|-------|
+| PyTorch | 12.6 ms | 79 FPS | A100 GPU |
+| ONNX Runtime | 12.5 ms | 80 FPS | A100 GPU |
+| TensorRT FP16 | **4.7 ms** | **215 FPS** | A100 GPU — 2.7× speedup |
+
+### Unseen Data Inference (20 held-out wafer images, local CPU)
+
+| Metric | Value |
+|--------|-------|
+| Images processed | 20 |
+| Detection rate | **100%** (20/20 images) |
+| Total detections | 57 |
+| Mean detections/image | 2.85 |
+| Dominant defect class | edge_chip (52/57 detections) |
+| CPU inference speed | 601 ms / 1.7 FPS |
+
+> Inference run locally on Apple M3 CPU using `scripts/run_unseen_inference.py`.
+> A100 TensorRT FP16 achieves 4.7ms / 215 FPS for production throughput.
+
+### Output Artifacts
+
+| File | Description |
+|------|-------------|
+| `outputs/results_summary.json` | Full test-set metrics for all 3 models |
+| `outputs/speed_benchmark.json` | PyTorch / ONNX / TensorRT latency |
+| `outputs/unseen_results/unseen_inference_results.json` | Per-image inference results (20 unseen images) |
+| `outputs/unseen_results/annotated/` | Annotated images with bounding boxes |
+| `outputs/confusion_matrix.png` | Confusion matrix (test set) |
+| `outputs/BoxPR_curve.png` | Precision-Recall curves per class |
+| `outputs/results.png` | Training loss and metric curves |
+| `models/best.pt` | YOLOv8-L weights (84 MB) |
 
 ## Testing
 

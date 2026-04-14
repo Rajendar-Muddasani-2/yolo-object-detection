@@ -1,0 +1,64 @@
+[
+  {
+    "image": "realistic_00.jpg",
+    "detections": 3,
+    "classes": [
+      "scratch (0.83)",
+      "particle (0.57)",
+      "crack (0.34)"
+    ]
+  },
+  {
+    "image": "realistic_01.jpg",
+    "detections": 2,
+    "classes": [
+      "crack (0.93)",
+      "edge_chip (0.82)"
+    ]
+  },
+  {
+    "image": "realistic_02.jpg",
+    "detections": 1,
+    "classes": [
+      "scratch (0.95)"
+    ]
+  },
+  {
+    "image": "realistic_03.jpg",
+    "detections": 3,
+    "classes": [
+      "edge_chip (0.90)",
+      "void (0.87)",
+      "delamination (0.43)"
+    ]
+  },
+  {
+    "image": "realistic_04.jpg",
+    "detections": 4,
+    "classes": [
+      "delamination (0.94)",
+      "crack (0.90)",
+      "delamination (0.66)",
+      "scratch (0.37)"
+    ]
+  },
+  {
+    "image": "realistic_05.jpg",
+    "detections": 4,
+    "classes": [
+      "edge_chip (0.91)",
+      "crack (0.89)",
+      "scratch (0.87)",
+      "edge_chip (0.78)"
+    ]
+  },
+  {
+    "image": "realistic_06.jpg",
+    "detections": 3,
+    "classes": [
+      "delamination (0.90)",
+      "delamination (0.81)",
+      "void (0.76)"
+    ]
+  }
+]

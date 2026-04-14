@@ -37,6 +37,12 @@ services:
     environment:
       - TRITON_URL=triton:8000
       - CUDA_VISIBLE_DEVICES=0
+      - AUTH_ENABLED=true
+      - API_KEY=${API_KEY:-change-me-in-production}
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - RATE_LIMIT_REQUESTS=100
+      - RATE_LIMIT_WINDOW=60
+      - ALLOWED_ORIGINS=http://localhost:3000,http://frontend:80
     depends_on:
       triton:
         condition: service_healthy
@@ -83,6 +89,7 @@ services:
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/wafer_defect_dashboard.json
     depends_on:
       - prometheus
 

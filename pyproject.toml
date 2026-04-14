@@ -33,6 +33,7 @@ dev = [
     "pytest-asyncio>=0.23",
     "ruff>=0.2",
     "black>=24.0",
+    "locust>=2.20",
 ]
 gpu = [
     "tritonclient[all]>=2.42",

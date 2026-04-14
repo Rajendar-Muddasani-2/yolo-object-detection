@@ -134,6 +134,6 @@ class TestAPIServer:
         async with AsyncClient(transport=transport, base_url="http://test") as client:
             resp = await client.get("/classes")
             assert resp.status_code == 200
-            classes = resp.json()
-            assert len(classes) == 10
-            assert "scratch" in classes
+            data = resp.json()
+            assert data["num_classes"] == 10
+            assert "scratch" in data["classes"]

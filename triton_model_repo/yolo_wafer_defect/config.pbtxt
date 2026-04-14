@@ -29,3 +29,14 @@ instance_group [
     kind: KIND_GPU
   }
 ]
+
+# Model versioning policy:
+#   Version 1: ONNX (default, production)
+#   Version 2: TensorRT FP16 (after running tensorrt_benchmark.ipynb)
+#
+# To enable A/B testing between versions, set:
+#   version_policy { specific { versions: [1, 2] } }
+# Then route traffic via Triton's model control API
+version_policy {
+  latest { num_versions: 1 }
+}

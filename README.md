@@ -1,8 +1,47 @@
 # YOLOv8 Wafer Defect Detection
 
-Production-grade semiconductor wafer defect detection using **YOLOv8-Large** (44M parameters), trained on 20K+ synthetic defect images across 10 defect classes with optional MVTec AD real-world industrial defect integration.
+Production-grade semiconductor wafer defect detection system using **YOLOv8-Large** (44M parameters). Trained on 20K+ synthetic defect images across 10 defect classes with MVTec AD real-world industrial defect integration. Deployed with NVIDIA Triton Inference Server, FastAPI, and React frontend.
 
-## Architecture
+<p align="center">
+  <img src="outputs/yolo_wafer_detection.gif" alt="YOLO detection algorithm walkthrough" width="800"/>
+</p>
+
+<p align="center"><em>How YOLO detects semiconductor wafer defects in a single forward pass</em></p>
+
+---
+
+## Key Results
+
+| Metric | Value |
+|--------|-------|
+| **mAP@50** | 99.22% |
+| **mAP@50:95** | 95.74% |
+| **Precision** | 98.91% |
+| **Recall** | 98.61% |
+| **TensorRT FP16 Latency** | 4.7 ms |
+| **TensorRT FPS** | 215 FPS |
+| **Defect Classes** | 10 |
+| **Model Parameters** | 43.7M |
+| **Training Hardware** | NVIDIA A100-SXM4-80GB |
+
+---
+
+## How It Works
+
+YOLO (You Only Look Once) processes the **entire image in a single forward pass** through a CNN. Unlike traditional detectors that scan an image hundreds of times with sliding windows, YOLO divides the image into a grid and predicts bounding boxes + class probabilities for all cells simultaneously.
+
+<p align="center">
+  <img src="outputs/sample_predictions.png" alt="Sample YOLO predictions on wafer defects" width="700"/>
+</p>
+
+### Detection Pipeline
+
+```
+Input Image (640×640) → CNN Backbone → 13×13 Feature Grid → Simultaneous Prediction
+    → Raw Candidate Boxes → Non-Max Suppression → Final Detections with Labels
+```
+
+### Architecture
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌───────────────┐     ┌──────────────┐
@@ -16,11 +55,15 @@ Production-grade semiconductor wafer defect detection using **YOLOv8-Large** (44
                      └─────────────┘                           └───────────────┘
 ```
 
+---
+
 ## Defect Classes
+
+10 semiconductor-specific defect types covering the most common failure modes in wafer fabrication:
 
 | ID | Class | Description |
 |----|-------|-------------|
-| 0 | scratch | Linear surface damage |
+| 0 | scratch | Linear surface damage from handling |
 | 1 | particle | Foreign material contamination |
 | 2 | edge_chip | Chipping at wafer edges |
 | 3 | void | Missing material / holes |
@@ -31,85 +74,120 @@ Production-grade semiconductor wafer defect detection using **YOLOv8-Large** (44
 | 8 | contamination | Chemical residue |
 | 9 | delamination | Layer separation |
 
+<p align="center">
+  <img src="outputs/class_distribution.png" alt="Defect class distribution in training data" width="600"/>
+</p>
+
+---
+
 ## Quick Start
 
-### 1. Generate Synthetic Dataset
+### Prerequisites
+
+- Python 3.10+
+- Docker & Docker Compose (for full stack)
+- NVIDIA GPU (recommended for training/inference, CPU fallback available)
+
+### 1. Clone and Install
+
+```bash
+git clone https://github.com/Rajendar-Muddasani-2/yolo-object-detection.git
+cd yolo-object-detection
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2. Generate Synthetic Dataset
 
 ```bash
 python -c "from src.data_generator import generate_dataset; generate_dataset('data/wafer_defects', n_images=1000)"
 ```
 
-### 2. Train on GPU (Colab/Kaggle)
+### 3. Train on GPU (Colab/Kaggle)
 
-Upload `notebooks/train_yolov8_colab.ipynb` to Google Colab with A100/T4 runtime. The notebook handles:
-- 20K image generation + MVTec AD integration
-- YOLOv8-Large training (100 epochs)
-- Multi-scale model comparison (S vs M vs L)
-- ONNX + TensorRT export with speed benchmarks
+Upload `notebooks/train_yolov8_colab.ipynb` to Google Colab with A100/T4 runtime:
+- Generates 20K images + MVTec AD integration
+- Trains YOLOv8-Large for 100 epochs
+- Compares S vs M vs L model variants
+- Exports to ONNX + TensorRT with speed benchmarks
 
-### 3. Run Inference API
+### 4. Run Inference (Local)
 
 ```bash
-# With Docker
+# Single image
+python scripts/run_unseen_inference.py
+
+# The script processes all images in outputs/realistic_unseen/
+# Results saved to outputs/realistic_unseen/annotated/
+```
+
+### 5. Start the API Server
+
+```bash
+# Option A: Docker (recommended)
 docker compose up api
 
-# Without Docker
+# Option B: Direct
 uvicorn src.api.server:app --host 0.0.0.0 --port 8080
 ```
 
-### 4. Full Stack (Triton + API + React + Monitoring)
+### 6. Full Production Stack
 
 ```bash
 docker compose up -d
 ```
 
-Services:
 | Service | Port | Description |
 |---------|------|-------------|
-| React Frontend | 3000 | Drag-drop detection UI |
-| FastAPI Gateway | 8080 | REST API with /detect endpoint |
-| Triton Server | 8000-8002 | GPU inference server |
+| React Frontend | 3000 | Drag-and-drop detection UI |
+| FastAPI Gateway | 8080 | REST API with `/detect` endpoint |
+| Triton Server | 8000-8002 | GPU inference server (ONNX/TensorRT) |
 | MLflow | 5000 | Experiment tracking |
 | Prometheus | 9090 | Metrics collection |
-| Grafana | 3001 | Dashboards |
+| Grafana | 3001 | Monitoring dashboards |
 | Redis | 6379 | Response caching |
 
-## API Endpoints
+---
 
-```
-POST /detect           - Detect defects in uploaded image
-POST /detect/batch     - Batch detection (up to 16 images)
-GET  /health           - Service health check
-GET  /classes          - List defect classes
-GET  /metrics          - Prometheus metrics
+## API Reference
+
+### Detect Defects
+
+```bash
+curl -X POST http://localhost:8080/detect \
+  -F "file=@wafer_image.jpg" \
+  | python -m json.tool
 ```
 
-## Project Structure
+**Response:**
+```json
+{
+  "detections": [
+    {"class": "crack", "confidence": 0.93, "bbox": [120, 340, 580, 410]},
+    {"class": "edge_chip", "confidence": 0.91, "bbox": [45, 210, 95, 260]}
+  ],
+  "inference_time_ms": 4.7,
+  "model": "yolov8l"
+}
+```
 
-```
-├── notebooks/
-│   └── train_yolov8_colab.ipynb    # GPU training notebook (Colab A100)
-├── src/
-│   ├── data_generator.py           # 10-class synthetic wafer defect generator
-│   ├── mvtec_integration.py        # MVTec AD converter + dataset merger
-│   ├── yolo_utils.py               # Detection utilities (Ultralytics-native)
-│   └── api/
-│       └── server.py               # FastAPI gateway (Triton + fallback)
-├── frontend/                       # React + TypeScript + Vite
-│   ├── src/App.tsx                 # Detection UI with canvas overlay
-│   └── Dockerfile                  # Multi-stage Node → Nginx
-├── triton_model_repo/              # NVIDIA Triton model config
-├── monitoring/                     # Prometheus + Grafana configs
-├── docker-compose.yml              # Full 7-service stack
-├── Dockerfile                      # FastAPI service container
-└── tests/                          # pytest suite
-```
+### All Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/detect` | Detect defects in a single image |
+| POST | `/detect/batch` | Batch detection (up to 16 images) |
+| GET | `/health` | Service health check |
+| GET | `/classes` | List all 10 defect classes |
+| GET | `/metrics` | Prometheus metrics |
+
+---
 
 ## Training Results
 
 Trained on **NVIDIA A100-SXM4-80GB** (Google Colab). Dataset: 20K synthetic wafer defects + MVTec AD real industrial images (~25K total, 70/15/15 split).
 
-### Model Comparison (10-class wafer defect detection)
+### Model Comparison
 
 | Model | mAP@50 | mAP@50:95 | Precision | Recall | Params | Training Time |
 |-------|--------|-----------|-----------|--------|--------|---------------|
@@ -117,50 +195,125 @@ Trained on **NVIDIA A100-SXM4-80GB** (Google Colab). Dataset: 20K synthetic wafe
 | YOLOv8-M | 99.16% | 96.05% | 98.76% | 98.36% | 25.9M | 134 min |
 | **YOLOv8-L** | **99.22%** | **95.74%** | **98.91%** | **98.61%** | **43.7M** | **334 min** |
 
-### Speed Benchmark (batch=1)
+<p align="center">
+  <img src="outputs/model_comparison.png" alt="Model comparison chart" width="600"/>
+</p>
 
-| Backend | Mean Latency | FPS | Notes |
-|---------|-------------|-----|-------|
-| PyTorch | 12.6 ms | 79 FPS | A100 GPU |
-| ONNX Runtime | 12.5 ms | 80 FPS | A100 GPU |
-| TensorRT FP16 | **4.7 ms** | **215 FPS** | A100 GPU — 2.7× speedup |
+### Speed Benchmark
 
-### Unseen Data Inference (20 held-out wafer images, local CPU)
+| Backend | Latency | FPS | Speedup |
+|---------|---------|-----|---------|
+| PyTorch | 12.6 ms | 79 | 1.0x |
+| ONNX Runtime | 12.5 ms | 80 | 1.0x |
+| **TensorRT FP16** | **4.7 ms** | **215** | **2.7x** |
+
+<p align="center">
+  <img src="outputs/speed_benchmark.png" alt="Speed benchmark comparison" width="500"/>
+</p>
+
+### Training Curves
+
+<p align="center">
+  <img src="outputs/results.png" alt="Training loss and metrics over 100 epochs" width="700"/>
+</p>
+
+### Confusion Matrix
+
+<p align="center">
+  <img src="outputs/confusion_matrix_normalized.png" alt="Normalized confusion matrix" width="500"/>
+</p>
+
+### Precision-Recall Curve
+
+<p align="center">
+  <img src="outputs/BoxPR_curve.png" alt="Precision-Recall curves per class" width="500"/>
+</p>
+
+---
+
+## Inference on Unseen Data
+
+Tested on realistic synthetic wafer images that the model never saw during training:
 
 | Metric | Value |
 |--------|-------|
-| Images processed | 20 |
-| Detection rate | **100%** (20/20 images) |
-| Total detections | 57 |
-| Mean detections/image | 2.85 |
-| Dominant defect class | edge_chip (52/57 detections) |
-| CPU inference speed | 601 ms / 1.7 FPS |
+| Images processed | 7 (realistic) + 20 (synthetic) |
+| Detection rate | **100%** |
+| Defect types found | scratch, crack, edge_chip, delamination, void, particle |
+| CPU inference speed | 601 ms (Apple M3) |
+| GPU inference speed | 4.7 ms (A100 TensorRT FP16) |
 
-> Inference run locally on Apple M3 CPU using `scripts/run_unseen_inference.py`.
-> A100 TensorRT FP16 achieves 4.7ms / 215 FPS for production throughput.
+<p align="center">
+  <img src="outputs/realistic_unseen/annotated/realistic_01.jpg" alt="Detection on realistic wafer - crack and edge_chip" width="350"/>
+  <img src="outputs/realistic_unseen/annotated/realistic_05.jpg" alt="Detection on realistic wafer - multiple defects" width="350"/>
+</p>
+<p align="center"><em>Left: crack (93%) + edge_chip (82%) | Right: edge_chip (91%) + crack (89%) + scratch (87%)</em></p>
 
-### Output Artifacts
+---
 
-| File | Description |
-|------|-------------|
-| `outputs/results_summary.json` | Full test-set metrics for all 3 models |
-| `outputs/speed_benchmark.json` | PyTorch / ONNX / TensorRT latency |
-| `outputs/unseen_results/unseen_inference_results.json` | Per-image inference results (20 unseen images) |
-| `outputs/unseen_results/annotated/` | Annotated images with bounding boxes |
-| `outputs/confusion_matrix.png` | Confusion matrix (test set) |
-| `outputs/BoxPR_curve.png` | Precision-Recall curves per class |
-| `outputs/results.png` | Training loss and metric curves |
-| `models/best.pt` | YOLOv8-L weights (84 MB) |
+## Project Structure
+
+```
+yolo-object-detection/
+├── models/
+│   ├── best.pt                     # YOLOv8-L trained weights (84 MB)
+│   └── best.onnx                   # ONNX export (167 MB, Git LFS)
+├── notebooks/
+│   └── train_yolov8_colab.ipynb    # GPU training notebook (Colab A100)
+├── scripts/
+│   ├── run_unseen_inference.py     # Run model on unseen images
+│   ├── create_detection_gif.py     # Generate algorithm visualization GIF
+│   └── generate_realistic_wafers.py # Photorealistic wafer image generator
+├── src/
+│   ├── data_generator.py           # 10-class synthetic defect generator
+│   ├── mvtec_integration.py        # MVTec AD dataset converter + merger
+│   ├── yolo_utils.py               # Detection utilities (export, benchmark)
+│   └── api/
+│       └── server.py               # FastAPI gateway (Triton + fallback)
+├── frontend/                       # React + TypeScript + Vite
+│   ├── src/App.tsx                 # Detection UI with canvas overlay
+│   └── Dockerfile                  # Multi-stage Node → Nginx build
+├── triton_model_repo/              # NVIDIA Triton model configuration
+├── monitoring/                     # Prometheus + Grafana configs
+├── tests/                          # pytest test suite
+├── outputs/                        # Training artifacts, charts, inference results
+├── docker-compose.yml              # 7-service production stack
+├── Dockerfile                      # FastAPI container
+├── requirements.txt                # Python dependencies
+└── .github/workflows/ci.yml       # GitHub Actions lint + test
+```
+
+---
 
 ## Testing
 
 ```bash
+# Install dev dependencies
 pip install -e ".[dev]"
+
+# Run test suite
 pytest tests/ -v
+
+# CI runs automatically on push/PR (Python 3.10, 3.11, 3.12)
 ```
+
+---
+
+## Model Files
+
+| File | Size | Format | Description |
+|------|------|--------|-------------|
+| `models/best.pt` | 84 MB | PyTorch | Trained YOLOv8-L weights |
+| `models/best.onnx` | 167 MB | ONNX (Git LFS) | Optimized for Triton/ONNX Runtime |
+
+To use the ONNX model, ensure Git LFS is installed:
+```bash
+git lfs install
+git lfs pull
+```
+
+---
 
 ## License
 
 MIT
-
-⭐ **Star this repository if you find it helpful!**

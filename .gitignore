@@ -157,3 +157,7 @@ outputs/unseen_test_images/*.png
 ENHANCEMENT_PLAN.md
 copilot-instructions.md
 PRD.md
+
+# Local archive and internal docs (not for GitHub)
+archive/
+docs/

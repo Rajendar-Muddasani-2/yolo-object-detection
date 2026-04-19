@@ -1,6 +1,6 @@
 # YOLOv8 Wafer Defect Detection
 
-Production-grade semiconductor wafer defect detection system using **YOLOv8-Large** (44M parameters). Trained on 20K+ synthetic defect images across 10 defect classes with MVTec AD real-world industrial defect integration. Deployed with NVIDIA Triton Inference Server, FastAPI, and React frontend.
+Production-grade post-silicon wafer defect detection system using **YOLOv8-Large** (44M parameters). Trained on 20K+ synthetic defect images across 10 defect classes with MVTec AD real-world industrial defect integration. Deployed with NVIDIA Triton Inference Server, FastAPI, and React frontend. GPU-benchmarked on T4 (16.1ms FP16) and A100 (4.5ms TensorRT).
 
 <p align="center">
   <img src="outputs/yolo_wafer_detection.gif" alt="YOLO detection algorithm walkthrough" width="800"/>
@@ -298,7 +298,11 @@ yolo-object-detection/
 ├── triton_model_repo/              # NVIDIA Triton model configuration
 ├── monitoring/                     # Prometheus + Grafana configs
 ├── tests/                          # pytest test suite
-├── outputs/                        # Training artifacts, charts, inference results
+├── outputs/
+│   ├── gpu_stack_results/          # T4 FP16 benchmark (JSON, PNG, CSV)
+│   ├── tensorrt_results/           # A100 TensorRT benchmark results
+│   ├── realistic_unseen/           # Realistic wafer inference results
+│   └── *.png, *.json              # Training charts and metrics
 ├── docker-compose.yml              # 7-service production stack
 ├── Dockerfile                      # FastAPI container
 ├── requirements.txt                # Python dependencies

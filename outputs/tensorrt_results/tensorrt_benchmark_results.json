@@ -1,0 +1,46 @@
+{
+  "pytorch": {
+    "mean_ms": 12.791,
+    "median_ms": 12.58,
+    "p95_ms": 15.129,
+    "p99_ms": 15.991,
+    "min_ms": 11.644,
+    "max_ms": 16.276,
+    "fps": 78.2,
+    "std_ms": 0.992,
+    "size_mb": 87.7
+  },
+  "onnx": {
+    "mean_ms": 9.153,
+    "median_ms": 9.124,
+    "p95_ms": 9.355,
+    "p99_ms": 9.513,
+    "min_ms": 9.027,
+    "max_ms": 9.773,
+    "fps": 109.3,
+    "std_ms": 0.105,
+    "size_mb": 174.7
+  },
+  "trt_fp32": {
+    "mean_ms": 4.547,
+    "median_ms": 4.526,
+    "p95_ms": 4.714,
+    "p99_ms": 4.85,
+    "min_ms": 4.458,
+    "max_ms": 4.925,
+    "fps": 219.9,
+    "std_ms": 0.079,
+    "size_mb": 90.4
+  },
+  "trt_fp16": {
+    "mean_ms": 4.52,
+    "median_ms": 4.513,
+    "p95_ms": 4.597,
+    "p99_ms": 4.674,
+    "min_ms": 4.459,
+    "max_ms": 4.688,
+    "fps": 221.3,
+    "std_ms": 0.04,
+    "size_mb": 90.4
+  }
+}

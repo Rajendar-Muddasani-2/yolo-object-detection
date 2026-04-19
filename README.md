@@ -18,8 +18,8 @@ Production-grade semiconductor wafer defect detection system using **YOLOv8-Larg
 | **mAP@50:95** | 95.74% |
 | **Precision** | 98.91% |
 | **Recall** | 98.61% |
-| **TensorRT FP16 Latency** | 4.7 ms |
-| **TensorRT FPS** | 215 FPS |
+| **T4 FP16 Latency** | 16.1 ms / 62 FPS |
+| **A100 TensorRT FP16** | 4.5 ms / 221 FPS |
 | **Defect Classes** | 10 |
 | **Model Parameters** | 43.7M |
 | **Training Hardware** | NVIDIA A100-SXM4-80GB |
@@ -166,7 +166,7 @@ curl -X POST http://localhost:8080/detect \
     {"class": "crack", "confidence": 0.93, "bbox": [120, 340, 580, 410]},
     {"class": "edge_chip", "confidence": 0.91, "bbox": [45, 210, 95, 260]}
   ],
-  "inference_time_ms": 4.7,
+  "inference_time_ms": 16.1,
   "model": "yolov8l"
 }
 ```
@@ -201,15 +201,35 @@ Trained on **NVIDIA A100-SXM4-80GB** (Google Colab). Dataset: 20K synthetic wafe
 
 ### Speed Benchmark
 
-| Backend | Latency | FPS | Speedup |
-|---------|---------|-----|---------|
-| PyTorch | 12.6 ms | 79 | 1.0x |
-| ONNX Runtime | 12.5 ms | 80 | 1.0x |
-| **TensorRT FP16** | **4.7 ms** | **215** | **2.7x** |
+| Backend | Hardware | Latency | FPS | Speedup |
+|---------|----------|---------|-----|---------|
+| PyTorch FP32 | A100 | 12.6 ms | 79 | 1.0x |
+| ONNX Runtime | A100 | 12.5 ms | 80 | 1.0x |
+| **PyTorch FP16** | **T4** | **16.1 ms** | **62** | — |
+| **TensorRT FP16** | **A100** | **4.5 ms** | **221** | **2.8x** |
 
 <p align="center">
   <img src="outputs/speed_benchmark.png" alt="Speed benchmark comparison" width="500"/>
 </p>
+
+### GPU Benchmark (Colab T4)
+
+End-to-end GPU stress test on NVIDIA T4 (Google Colab) with FP16 inference via FastAPI server:
+
+| Metric | Value |
+|--------|-------|
+| Direct Inference (P50) | 16.1 ms |
+| Direct Inference (P99) | 16.7 ms |
+| Throughput (FPS) | 62 |
+| Load Test (c=1→8) | 41-43 rps, **0% errors** |
+| Peak GPU Utilization | 61% |
+| GPU Memory Used | 1.12 GB / 16.1 GB |
+| GPU Temperature | 63-65°C |
+
+<p align="center">
+  <img src="outputs/gpu_stack_results/gpu_stack_benchmark.png" alt="GPU benchmark — latency, throughput, utilization" width="700"/>
+</p>
+<p align="center"><em>6-panel benchmark: API latency vs concurrency, throughput scaling, direct inference, GPU utilization, memory, and summary</em></p>
 
 ### Training Curves
 
@@ -241,7 +261,7 @@ Tested on realistic synthetic wafer images that the model never saw during train
 | Detection rate | **100%** |
 | Defect types found | scratch, crack, edge_chip, delamination, void, particle |
 | CPU inference speed | 601 ms (Apple M3) |
-| GPU inference speed | 4.7 ms (A100 TensorRT FP16) |
+| GPU inference speed | 16.1 ms (T4 FP16) / 4.5 ms (A100 TensorRT FP16) |
 
 <p align="center">
   <img src="outputs/realistic_unseen/annotated/realistic_01.jpg" alt="Detection on realistic wafer - crack and edge_chip" width="350"/>
@@ -259,7 +279,9 @@ yolo-object-detection/
 │   ├── best.pt                     # YOLOv8-L trained weights (84 MB)
 │   └── best.onnx                   # ONNX export (167 MB, Git LFS)
 ├── notebooks/
-│   └── train_yolov8_colab.ipynb    # GPU training notebook (Colab A100)
+│   ├── train_yolov8_colab.ipynb    # GPU training notebook (Colab A100)
+│   ├── colab_gpu_stack.ipynb       # GPU benchmark notebook (T4 FP16)
+│   └── tensorrt_benchmark.ipynb    # TensorRT optimization benchmark (A100)
 ├── scripts/
 │   ├── run_unseen_inference.py     # Run model on unseen images
 │   ├── create_detection_gif.py     # Generate algorithm visualization GIF
